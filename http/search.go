@@ -55,10 +55,10 @@ type ApiResponse struct {
 }
 
 type SearchResponse []struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	PubDate time.Time `json:"pub_date"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	PubDate     time.Time `json:"pub_date"`
 	Thumbnails  struct {
 		Default struct {
 			URL    string `json:"url"`
@@ -78,7 +78,7 @@ type SearchResponse []struct {
 	} `json:"thumbnails"`
 }
 
-func search(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) search(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 
 	url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=%s&key=%s", query, ApiKey)
