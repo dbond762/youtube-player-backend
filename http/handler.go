@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	player "github.com/dbond762/youtube-player-backend"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -14,9 +13,10 @@ import (
 
 type Handler struct {
 	UserService player.UserService
+	UserSession player.UserSession
 }
 
-func Setup(h Handler, port int) {
+func Setup(h *Handler, port int) {
 	r := chi.NewRouter()
 
 	CORS := cors.New(cors.Options{
@@ -29,12 +29,17 @@ func Setup(h Handler, port int) {
 	})
 	r.Use(CORS.Handler)
 
+	r.Use(h.AuthMiddleware)
 	r.Use(middleware.SetHeader("Content-Type", "application/json"))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
 	r.Get("/search/", h.search)
 	r.Get("/search/{query}", h.search)
+
+	r.Post("/signup", h.signUp)
+	r.Post("/login", h.login)
+	r.Get("/logout", h.logout)
 
 	log.Printf("Server run on http://localhost:%d", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), r); err != nil {

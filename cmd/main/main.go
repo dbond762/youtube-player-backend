@@ -2,10 +2,12 @@ package main
 
 import (
 	"database/sql"
-	_ "github.com/lib/pq"
+	"log"
+
 	"github.com/dbond762/youtube-player-backend/http"
 	"github.com/dbond762/youtube-player-backend/postgres"
-	"log"
+	"github.com/dbond762/youtube-player-backend/redis"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -21,8 +23,11 @@ func main() {
 
 	us := &postgres.UserService{DB: db}
 
+	session := redis.NewUserService("redis://yutube_player:@localhost:6379/0", us)
+
 	var h http.Handler
 	h.UserService = us
+	h.UserSession = session
 
-	http.Setup(h, 8080)
+	http.Setup(&h, 8080)
 }

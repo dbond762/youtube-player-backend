@@ -1,7 +1,7 @@
 CREATE TABLE "user" (
 "id"  SERIAL ,
-"login" VARCHAR(50) NOT NULL ,
-"password" VARCHAR(50) NOT NULL ,
+"login" VARCHAR(50) NOT NULL UNIQUE ,
+"password" VARCHAR(60) NOT NULL ,
 PRIMARY KEY ("id")
 );
 

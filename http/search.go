@@ -3,9 +3,11 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi"
+	"log"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/chi"
 )
 
 const ApiKey = "AIzaSyBVJgyC-x6CsM-hPCYY10VfOnGOKksDK8U"
@@ -84,14 +86,18 @@ func (h *Handler) search(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=%s&key=%s", query, ApiKey)
 	resp, err := http.Get(url)
 	if err != nil {
-		//
+		log.Printf("Error on get videolist: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
 	apiResp := new(ApiResponse)
 	if err := decoder.Decode(apiResp); err != nil {
-		//
+		log.Printf("Error on get decode api response: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	searchResp := make(SearchResponse, len(apiResp.Items))
@@ -105,6 +111,8 @@ func (h *Handler) search(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(&searchResp); err != nil {
-		//
+		log.Printf("Error on encode search response: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 }
