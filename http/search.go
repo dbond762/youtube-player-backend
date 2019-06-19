@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -10,103 +9,52 @@ import (
 	"github.com/go-chi/chi"
 )
 
-const ApiKey = "AIzaSyBVJgyC-x6CsM-hPCYY10VfOnGOKksDK8U"
-
-type ApiResponse struct {
-	Kind          string `json:"kind"`
-	Etag          string `json:"etag"`
-	NextPageToken string `json:"nextPageToken"`
-	RegionCode    string `json:"regionCode"`
-	PageInfo      struct {
-		TotalResults   int `json:"totalResults"`
-		ResultsPerPage int `json:"resultsPerPage"`
-	} `json:"pageInfo"`
+/*
+type ApiVideoResponse struct {
 	Items []struct {
-		Kind string `json:"kind"`
-		Etag string `json:"etag"`
-		ID   struct {
-			Kind    string `json:"kind"`
-			VideoID string `json:"videoId"`
-		} `json:"id"`
+		ID      string `json:"id"`
 		Snippet struct {
 			PublishedAt time.Time `json:"publishedAt"`
-			ChannelID   string    `json:"channelId"`
 			Title       string    `json:"title"`
 			Description string    `json:"description"`
 			Thumbnails  struct {
-				Default struct {
-					URL    string `json:"url"`
-					Width  int    `json:"width"`
-					Height int    `json:"height"`
-				} `json:"default"`
-				Medium struct {
-					URL    string `json:"url"`
-					Width  int    `json:"width"`
-					Height int    `json:"height"`
-				} `json:"medium"`
 				High struct {
 					URL    string `json:"url"`
-					Width  int    `json:"width"`
-					Height int    `json:"height"`
 				} `json:"high"`
 			} `json:"thumbnails"`
-			ChannelTitle         string `json:"channelTitle"`
-			LiveBroadcastContent string `json:"liveBroadcastContent"`
 		} `json:"snippet"`
+		Player struct {
+			EmbedHTML string `json:"embedHtml"`
+		} `json:"player"`
 	} `json:"items"`
 }
+*/
 
 type SearchResponse []struct {
 	ID          string    `json:"id"`
-	Name        string    `json:"name"`
+	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	PubDate     time.Time `json:"pub_date"`
-	Thumbnails  struct {
-		Default struct {
-			URL    string `json:"url"`
-			Width  int    `json:"width"`
-			Height int    `json:"height"`
-		} `json:"default"`
-		Medium struct {
-			URL    string `json:"url"`
-			Width  int    `json:"width"`
-			Height int    `json:"height"`
-		} `json:"medium"`
-		High struct {
-			URL    string `json:"url"`
-			Width  int    `json:"width"`
-			Height int    `json:"height"`
-		} `json:"high"`
-	} `json:"thumbnails"`
+	Thumbnail   string    `json:"thumbnail"`
 }
 
 func (h *Handler) search(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 
-	url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=%s&key=%s", query, ApiKey)
-	resp, err := http.Get(url)
+	list, err := h.VideoListService.Search(query)
 	if err != nil {
-		log.Printf("Error on get videolist: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
-	apiResp := new(ApiResponse)
-	if err := decoder.Decode(apiResp); err != nil {
-		log.Printf("Error on get decode api response: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("Error on search video: %s", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	searchResp := make(SearchResponse, len(apiResp.Items))
-	for i, video := range apiResp.Items {
-		searchResp[i].ID = video.ID.VideoID
-		searchResp[i].Name = video.Snippet.Title
-		searchResp[i].Description = video.Snippet.Description
-		searchResp[i].PubDate = video.Snippet.PublishedAt
-		searchResp[i].Thumbnails = video.Snippet.Thumbnails
+	searchResp := make(SearchResponse, len(*list))
+	for i, video := range *list {
+		searchResp[i].ID = video.ID
+		searchResp[i].Title = video.Title
+		searchResp[i].Description = video.Description
+		searchResp[i].PubDate = video.PubDate
+		searchResp[i].Thumbnail = video.Thumbnail
 	}
 
 	encoder := json.NewEncoder(w)

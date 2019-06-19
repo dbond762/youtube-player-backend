@@ -22,12 +22,17 @@ func main() {
 	defer db.Close()
 
 	us := &postgres.UserService{DB: db}
+	session := redis.NewUserService("redis://youtube_player:@localhost:6379/0", us)
+	vls := &postgres.VideoListService{
+		DB:     db,
+		Finder: redis.NewVideoSearcher("redis://youtube_player:@localhost:6379/1", new(http.VideoFinder)),
+	}
 
-	session := redis.NewUserService("redis://yutube_player:@localhost:6379/0", us)
+	h := &http.Handler{
+		UserService:      us,
+		UserSession:      session,
+		VideoListService: vls,
+	}
 
-	var h http.Handler
-	h.UserService = us
-	h.UserSession = session
-
-	http.Setup(&h, 8080)
+	http.Setup(h, 8080)
 }

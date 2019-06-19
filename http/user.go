@@ -8,7 +8,6 @@ import (
 	player "github.com/dbond762/youtube-player-backend"
 )
 
-
 type LoginRequest struct {
 	User struct {
 		Login    string `json:"login"`
@@ -99,7 +98,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-  	sessionID, ok := ctx.Value("sessionID").(string)
+	sessionID, ok := ctx.Value("sessionID").(string)
 	if !ok {
 		log.Printf("Not found session_id cookie")
 		return
@@ -107,4 +106,3 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 
 	h.UserSession.Logout(sessionID)
 }
-

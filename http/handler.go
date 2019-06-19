@@ -12,8 +12,9 @@ import (
 )
 
 type Handler struct {
-	UserService player.UserService
-	UserSession player.UserSession
+	UserService      player.UserService
+	UserSession      player.UserSession
+	VideoListService player.VideoListService
 }
 
 func Setup(h *Handler, port int) {

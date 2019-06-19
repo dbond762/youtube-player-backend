@@ -6,14 +6,19 @@ PRIMARY KEY ("id")
 );
 
 CREATE TABLE "video" (
-"id"  SERIAL ,
+"id"  VARCHAR(20) NOT NULL,
+"title" VARCHAR(50) NOT NULL,
+"pub_date" TIMESTAMP NOT NULL,
+"description" TEXT NOT NULL,
+"thumbnail" VARCHAR(70) NOT NULL,
+"player" TEXT NOT NULL DEFAULT '',
 PRIMARY KEY ("id")
 );
 
 CREATE TABLE "search_history" (
 "id"  SERIAL ,
 "query" VARCHAR(50) NOT NULL ,
-"time" DATETIME NOT NULL ,
+"time" TIMESTAMP NOT NULL ,
 "id_user" INTEGER ,
 PRIMARY KEY ("id")
 );
@@ -21,7 +26,7 @@ PRIMARY KEY ("id")
 CREATE TABLE "user_likes" (
 "id"  SERIAL ,
 "id_user" INTEGER ,
-"id_video" INTEGER ,
+"id_video" VARCHAR(20) ,
 PRIMARY KEY ("id")
 );
 

@@ -10,7 +10,6 @@ type User struct {
 	ID       int64
 	Login    string
 	Password string
-	Likes    []Video
 }
 
 func (u *User) CheckPassword(password []byte) bool {
