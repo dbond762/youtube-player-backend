@@ -27,11 +27,13 @@ func main() {
 		DB:     db,
 		Finder: redis.NewVideoSearcher("redis://youtube_player:@localhost:6379/1", new(http.VideoFinder)),
 	}
+	vs := &postgres.VideoService{DB: db}
 
 	h := &http.Handler{
 		UserService:      us,
 		UserSession:      session,
 		VideoListService: vls,
+		VideoService:     vs,
 	}
 
 	http.Setup(h, 8080)

@@ -35,13 +35,13 @@ func (s *UserService) UserByLogin(login string) (*player.User, error) {
 }
 
 func (s *UserService) CreateUser(u player.User) (*player.User, error) {
-	var lastID int64
 	hash, err := player.HashPassword([]byte(u.Password))
 	if err != nil {
 		log.Printf("Postgres: Error on hash password: %s", err)
 		return nil, err
 	}
 
+	var lastID int64
 	err = s.DB.QueryRow(`INSERT INTO "user" ("login", "password") VALUES ($1, $2)  RETURNING "id"`, u.Login, hash).Scan(&lastID)
 	if err != nil {
 		log.Printf("Postgres: Query error: %s", err)

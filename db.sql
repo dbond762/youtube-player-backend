@@ -24,10 +24,9 @@ PRIMARY KEY ("id")
 );
 
 CREATE TABLE "user_likes" (
-"id"  SERIAL ,
 "id_user" INTEGER ,
 "id_video" VARCHAR(20) ,
-PRIMARY KEY ("id")
+PRIMARY KEY ("id_user", "id_video")
 );
 
 ALTER TABLE "search_history" ADD FOREIGN KEY ("id_user") REFERENCES "user" ("id");

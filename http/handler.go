@@ -15,6 +15,7 @@ type Handler struct {
 	UserService      player.UserService
 	UserSession      player.UserSession
 	VideoListService player.VideoListService
+	VideoService     player.VideoService
 }
 
 func Setup(h *Handler, port int) {
