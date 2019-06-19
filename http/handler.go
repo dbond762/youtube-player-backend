@@ -44,6 +44,6 @@ func Setup(h *Handler, port int) {
 
 	log.Printf("Server run on http://localhost:%d", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), r); err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		log.Fatal("HTTP: err on ListenAndServe: ", err)
 	}
 }

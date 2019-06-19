@@ -2,9 +2,10 @@ package postgres
 
 import (
 	"database/sql"
+	"log"
+
 	player "github.com/dbond762/youtube-player-backend"
 	_ "github.com/lib/pq"
-	"log"
 )
 
 type VideoListService struct {

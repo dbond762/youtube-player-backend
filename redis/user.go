@@ -1,18 +1,14 @@
 package redis
 
 import (
-	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
 	player "github.com/dbond762/youtube-player-backend"
 	"github.com/gomodule/redigo/redis"
 	"github.com/google/uuid"
-)
-
-var (
-	AuthError = errors.New("Authentication error")
 )
 
 type UserSession struct {
@@ -39,7 +35,8 @@ func (s *UserSession) Login(login string) (*player.User, string, error) {
 
 	user, err := s.Service.UserByLogin(login)
 	if err != nil {
-		return nil, "", AuthError
+		log.Printf("Redis: Error on reqtriving user by login: %s", err)
+		return nil, "", err
 	}
 
 	token := uuid.New()
@@ -66,20 +63,21 @@ func (s *UserSession) Authenticate(token string) (*player.User, error) {
 	key := fmt.Sprintf("token_%s", token)
 
 	res, err := redis.String(conn.Do("GET", key))
-	if err == redis.ErrNil {
-		return nil, AuthError
-	} else if err != nil {
+	if err != nil {
+		log.Printf("Redis: Error on get session: %s", err)
 		return nil, err
 	}
 
 	id, err := strconv.Atoi(res)
 	if err != nil {
+		log.Printf("Redis: Error on converting: %s", err)
 		return nil, err
 	}
 
 	user, err := s.Service.UserByID(id)
 	if err != nil {
-		return nil, AuthError
+		log.Printf("Redis: Error on reqtriving user by id: %s", err)
+		return nil, err
 	}
 
 	return user, nil

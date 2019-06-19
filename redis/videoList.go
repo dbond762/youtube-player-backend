@@ -3,10 +3,11 @@ package redis
 import (
 	"bytes"
 	"encoding/gob"
-	player "github.com/dbond762/youtube-player-backend"
-	"github.com/gomodule/redigo/redis"
 	"log"
 	"time"
+
+	player "github.com/dbond762/youtube-player-backend"
+	"github.com/gomodule/redigo/redis"
 )
 
 type VideoFinder struct {

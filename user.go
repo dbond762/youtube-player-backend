@@ -28,6 +28,7 @@ func (u *User) CheckPassword(password []byte) bool {
 func HashPassword(password []byte) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
+		log.Printf("Error on gen hash: %s", err)
 		return "", err
 	}
 	return string(hash), nil

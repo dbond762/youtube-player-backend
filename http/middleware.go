@@ -19,7 +19,7 @@ func (h *Handler) AuthMiddleware(next http.Handler) http.Handler {
 		tee := io.TeeReader(r.Body, &buf)
 		newRequest, err := http.NewRequest(r.Method, r.URL.String(), tee)
 		if err != nil {
-			log.Printf("Failed to copy request: %s", err)
+			log.Printf("HTTP: Failed to copy request: %s", err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -35,7 +35,7 @@ func (h *Handler) AuthMiddleware(next http.Handler) http.Handler {
 
 		user, err := h.UserSession.Authenticate(authRequest.SessionID)
 		if err != nil {
-			log.Printf("User not authenticated: %s", err)
+			log.Printf("HTTP: User not authenticated: %s", err)
 
 			ctx := context.WithValue(r.Context(), "isLoggedIn", false)
 			next.ServeHTTP(w, newRequest.WithContext(ctx))

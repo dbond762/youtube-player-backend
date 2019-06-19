@@ -43,7 +43,7 @@ func (h *Handler) search(w http.ResponseWriter, r *http.Request) {
 
 	list, err := h.VideoListService.Search(query)
 	if err != nil {
-		log.Printf("Error on search video: %s", err)
+		log.Printf("HTTP: Error on search video: %s", err)
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
@@ -59,7 +59,7 @@ func (h *Handler) search(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(&searchResp); err != nil {
-		log.Printf("Error on encode search response: %s", err)
+		log.Printf("HTTP: Error on encode search response: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

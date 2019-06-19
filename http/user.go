@@ -30,7 +30,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var loginRequest LoginRequest
 	if err := decoder.Decode(&loginRequest); err != nil {
-		log.Printf("Error on decode login request: %s", err)
+		log.Printf("HTTP: Error on decode login request: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -42,15 +42,15 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.UserService.CreateUser(*user)
 	if err != nil {
-		log.Printf("Error on create user: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("HTTP: Error on create user: %s", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	_, sessionID, err := h.UserSession.Login(user.Login)
 	if err != nil {
-		log.Printf("Error on login user: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("HTTP: Error on login user: %s", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(&loginResp); err != nil {
-		log.Printf("Error on encoding login result: %s", err)
+		log.Printf("HTTP: Error on encoding login result: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -71,15 +71,15 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	loginForm := new(LoginRequest)
 	if err := decoder.Decode(loginForm); err != nil {
-		log.Printf("Error on decode login request: %s", err)
+		log.Printf("HTTP: Error on decode login request: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	user, sessionID, err := h.UserSession.Login(loginForm.User.Login)
 	if err != nil {
-		log.Printf("Error on login user: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		log.Printf("HTTP: Error on login user: %s", err)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(&loginResult); err != nil {
-		log.Printf("Error on encoding login result: %s", err)
+		log.Printf("HTTP: Error on encoding login result: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -100,7 +100,6 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	sessionID, ok := ctx.Value("sessionID").(string)
 	if !ok {
-		log.Printf("Not found session_id cookie")
 		return
 	}
 

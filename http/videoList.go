@@ -3,10 +3,11 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	player "github.com/dbond762/youtube-player-backend"
 	"log"
 	"net/http"
 	"time"
+
+	player "github.com/dbond762/youtube-player-backend"
 )
 
 const ApiKey = "AIzaSyBVJgyC-x6CsM-hPCYY10VfOnGOKksDK8U"
