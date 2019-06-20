@@ -14,6 +14,7 @@ type Video struct {
 }
 
 type VideoService interface {
+	Video(id string) (*Video, error)
 	Like(u *User, v *Video) error
 	Dislike(u *User, v *Video) error
 	IsLiked(u *User, v *Video) (bool, error)

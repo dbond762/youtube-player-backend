@@ -15,6 +15,7 @@ type AuthRequest struct {
 
 func (h *Handler) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Try copy a request to read it twice.
 		var buf bytes.Buffer
 		tee := io.TeeReader(r.Body, &buf)
 		newRequest, err := http.NewRequest(r.Method, r.URL.String(), tee)
