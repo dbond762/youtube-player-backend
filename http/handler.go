@@ -43,6 +43,9 @@ func Setup(h *Handler, port int) {
 	r.Post("/login", h.login)
 	r.Get("/logout", h.logout)
 
+	r.Get("/like/{videoID}", h.like)
+	r.Get("/dislike/{videoID}", h.dislike)
+
 	log.Printf("Server run on http://localhost:%d", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), r); err != nil {
 		log.Fatal("HTTP: err on ListenAndServe: ", err)

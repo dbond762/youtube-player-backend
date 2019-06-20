@@ -33,9 +33,10 @@ type ApiSearchResponse struct {
 type VideoFinder struct{}
 
 func (s *VideoFinder) Search(query string) (*player.VideoList, error) {
+	const maxResults = 25
 
-	url := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=%s&key=%s", query, ApiKey)
-	resp, err := http.Get(url)
+	baseUrl := fmt.Sprintf("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=%d&q=%s&key=%s", maxResults, query, ApiKey)
+	resp, err := http.Get(baseUrl)
 	if err != nil {
 		log.Printf("HTTP: error on get request: %s", err)
 		return nil, err

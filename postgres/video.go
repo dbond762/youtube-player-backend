@@ -13,6 +13,17 @@ type VideoService struct {
 	DB *sql.DB
 }
 
+func (s *VideoService) Video(id string) (*player.Video, error) {
+	var v player.Video
+	row := s.DB.QueryRow(`SELECT "id", "title", "pub_date", "description", "thumbnail", "player" FROM "video" WHERE "id" = $1`, id)
+	if err := row.Scan(&v.ID, &v.Title, &v.PubDate, &v.Description, &v.Thumbnail, &v.Player); err != nil {
+		log.Printf("Postgres: Error on scan row: %s", err)
+		return nil, err
+	}
+
+	return &v, nil
+}
+
 func (s *VideoService) Like(u *player.User, v *player.Video) error {
 	var lastID int64
 	err := s.DB.QueryRow(
