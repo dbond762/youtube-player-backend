@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"github.com/lib/pq"
 	"log"
 
 	player "github.com/dbond762/youtube-player-backend"
@@ -14,7 +15,17 @@ type VideoService struct {
 
 func (s *VideoService) Like(u *player.User, v *player.Video) error {
 	var lastID int64
-	err := s.DB.QueryRow(`INSERT INTO "user_likes" ("id_user", "id_video") VALUES ($1, $2)`, u.ID, v.ID).Scan(&lastID)
+	err := s.DB.QueryRow(
+		`INSERT INTO "video" ("id", "title", "pub_date", "description", "thumbnail") VALUES ($1, $2, $3, $4, $5)`,
+		v.ID, v.Title, v.PubDate, v.Description, v.Thumbnail).Scan(&lastID)
+	if pgerr, ok := err.(*pq.Error); ok {
+		if err != nil || pgerr.Code.Name() != "unique_violation" {
+			log.Printf("Postgres: Error on scan row: %s", err)
+			return err
+		}
+	}
+
+	err = s.DB.QueryRow(`INSERT INTO "user_likes" ("id_user", "id_video") VALUES ($1, $2)`, u.ID, v.ID).Scan(&lastID)
 	if err != nil {
 		log.Printf("Postgres: Error on scan row: %s", err)
 		return err
