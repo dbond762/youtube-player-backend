@@ -18,15 +18,27 @@ func (s *VideoListService) Search(query string) (*player.VideoList, error) {
 }
 
 func (s *VideoListService) SearchByUser(query string, user *player.User) (*player.VideoList, error) {
-	list, err := s.Finder.Search(query)
+	foundVideos, err := s.Finder.Search(query)
 	if err != nil {
 		log.Printf("Postgres: error on search video: %s", err)
 		return nil, err
 	}
 
-	// TODO: Add likes
+	likedVideos, err := s.Likes(user)
+	if err != nil {
+		log.Printf("Postgres: error on get likes list: %s", err)
+		return nil, err
+	}
 
-	return list, nil
+	for _, liked := range *likedVideos {
+		for i, found := range *foundVideos {
+			if liked.ID == found.ID {
+				(*foundVideos)[i].Liked = true
+			}
+		}
+	}
+
+	return foundVideos, nil
 }
 
 func (s *VideoListService) Likes(user *player.User) (*player.VideoList, error) {
